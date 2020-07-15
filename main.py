@@ -3,24 +3,28 @@ from typing import Optional
 from fastapi import FastAPI
 from pydantic import BaseModel
 
+from storage import Game, get_all, create, delete
+
 app = FastAPI()
 
-class Game(BaseModel):
-    port: int
-    address: str
-    name: str
-    type: str
-
 @app.get("/")
-def read_root():
-    return {"Hello": "World"}
-
+def index():
+    # TODO: Render some nice HTML or whatever
+    return None
 
 @app.get("/games")
-def get_games(type: Optional[string] = None):
-    return { "query": "select * from games"}
+def get_games(type: Optional[str] = None):
+    return [
+        game for game in 
+        get_all()
+        if type == game.type or not type
+    ]
 
-@app.put("/game"):
+@app.put("/game")
 def add_game(game: Game):
-    return { "query": "insert ({', '.join([v for k, v in game])}) into games"}
+    create(game)
+
+@app.delete("/game")
+def delete_game(name: str):
+    delete(name)
 
