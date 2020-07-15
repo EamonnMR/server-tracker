@@ -1,0 +1,32 @@
+---
+- name: Deploy
+  hosts: all
+  become: true
+  become_user: root
+  vars:
+    service_name: server-tracker-gunicorn.service
+    user: server-tracker
+  tasks:
+  - name: Install apt packages
+    apt: name={{item}} state=present update_cache=yes
+    with_items:
+    - "nginx"
+    - "redis"
+  - name: Upload Build
+    copy: src=. dest=/var/www/server-tracker
+  - name: Copy in nginx config
+    copy: src=server-tracker.conf dest=/etc/nginx/sites-enabled
+  - name: Copy in gunicorn service file 
+    copy: src={{ service_name }} dest=/etc/nginx/sites-enabled
+  - name: Adds the special user for running the service
+    user:
+      name: {{ user }}
+      comment: For running server-tracker
+      group: {{ user }}
+
+  - name: Ensure that server is running
+    service: name={{ service_name }}
+  - name: Ensure that the new nginx config is applied
+    service: name=nginx state=restarted
+  - name: Ensure that Redis is running
+    service: name=redis state=running
