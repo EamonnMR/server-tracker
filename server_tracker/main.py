@@ -3,7 +3,7 @@ from typing import Optional
 from fastapi import FastAPI
 from pydantic import BaseModel
 
-from storage import Game, get_all, create, delete
+from server_tracker.storage import Game, get_all, create, delete
 
 app = FastAPI()
 

@@ -4,29 +4,62 @@
   become: true
   become_user: root
   vars:
-    service_name: server-tracker-gunicorn.service
+    service_name: server-tracker.service
     user: server-tracker
+    dir: /var/www/server-tracker/
   tasks:
   - name: Install apt packages
     apt: name={{item}} state=present update_cache=yes
     with_items:
     - "nginx"
     - "redis"
-  - name: Upload Build
-    copy: src=. dest=/var/www/server-tracker
+    - "python3-pip"
+
+  - name: Upload Source
+    copy: src=server_tracker dest="{{dir}}"
+  - name: Requirements
+    copy: src=requirements.txt dest="{{dir}}"
+  
+  - name: Install virtualenv (required for pip)
+    shell: "pip3 install virtualenv"
+
+  - name: Clean out old venv
+    file:
+      path: "{{dir}}venv"
+      state: absent
+
+  - name: Create virtual environment
+    shell: "virtualenv -p python3 {{dir}}venv"
+
+  - name: Install packages
+    shell: "{{dir}}venv/bin/pip install -r {{dir}}requirements.txt"
+
   - name: Copy in nginx config
     copy: src=server-tracker.conf dest=/etc/nginx/sites-enabled
   - name: Copy in gunicorn service file 
-    copy: src={{ service_name }} dest=/etc/nginx/sites-enabled
+    copy: src={{ service_name }} dest=/etc/systemd/system/
+
+  - name: "Ensure group {{user}} exists"
+    group:
+      name: "{{ user }}"
+      state: present
+
   - name: Adds the special user for running the service
     user:
-      name: {{ user }}
+      name: "{{ user }}"
       comment: For running server-tracker
-      group: {{ user }}
+      group: "{{ user }}"
+      state: present
+
+  - name: Chown the working directory
+    file:
+      path: "{{dir}}"
+      owner: "{{user}}"
+      recurse: true
 
   - name: Ensure that server is running
     service: name={{ service_name }}
   - name: Ensure that the new nginx config is applied
     service: name=nginx state=restarted
   - name: Ensure that Redis is running
-    service: name=redis state=running
+    service: name=redis state=started
