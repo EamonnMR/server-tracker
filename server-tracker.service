@@ -1,0 +1,20 @@
+[Unit]
+Description = Server-tracker
+After = network.target
+
+[Service]
+PermissionsStartOnly = true
+PIDFile = /run/server-tracker/server-tracker.pid
+User = server-tracker
+Group = server-tracker
+WorkingDirectory = /var/www/server-tracker
+ExecStartPre = /bin/mkdir /run/server-tracker
+ExecStartPre = /bin/chown -R server-tracker:server-tracker /run/server-tracker
+ExecStart = /var/www/server-tracker/venv/bin/gunicorn server_tracker.main:app -b 0.0.0.0:8000 --pid /run/server-tracker/server-tracker.pid --workers 1 --worker-class uvicorn.workers.UvicornWorker
+ExecReload = /bin/kill -s HUP $MAINPID
+ExecStop = /bin/kill -s TERM $MAINPID
+ExecStopPost = /bin/rm -rf /run/server-tracker
+PrivateTmp = true
+
+[Install]
+WantedBy = multi-user.target
