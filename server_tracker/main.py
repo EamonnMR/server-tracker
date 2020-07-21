@@ -1,11 +1,18 @@
 from typing import Optional
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from pydantic import BaseModel
 
 from server_tracker.storage import Game, get_all, create, delete
 
 app = FastAPI()
+
+def get_host_ip(request: Request):
+    """ Rather than auth, the idea is that you can only affect
+    games that you are yourself hosting.
+    This attempts to support both local development and prod
+    use behind a proxy server."""
+    return request.headers.get("X-Real-IP", request.client.host)
 
 @app.get("/")
 def index():
@@ -21,10 +28,11 @@ def get_games(type: Optional[str] = None):
     ]
 
 @app.put("/game")
-def add_game(game: Game):
+def add_game(game: Game, request: Request):
+    game.address = get_host_ip(request)
     create(game)
 
 @app.delete("/game")
-def delete_game(name: str):
-    delete(name)
+def delete_game(request: Request):
+    delete(get_host_ip(request))
 
