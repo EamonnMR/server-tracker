@@ -1,4 +1,4 @@
-Very simple server registrar for https://github.com/eamonnmr/project_orinoco
+Very simple server registrar for https://github.com/eamonnmr/orbital_fortress
 
 and whatever else you want to use it for. Made with Redis and Fastapi.
 
