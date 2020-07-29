@@ -12,6 +12,6 @@ To run locally (Python 3.8)
 
 To Deploy to a server:
 
-Run `deploy.yml`, probably changing `inventory` to point to a server you can ssh into.
+Run `deploy.yml`, probably changing `inventory` to point to a server you can ssh into. Also make sure the hostname in the configs matches the hostname of your server.
 
 
