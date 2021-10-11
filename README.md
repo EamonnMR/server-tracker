@@ -1,8 +1,8 @@
-Very simple server registrar for https://github.com/eamonnmr/project_orinoco
+Very simple server registrar for https://github.com/EamonnMR/mpevmvp and https://github.com/eamonnmr/orbital_fortress
 
 and whatever else you want to use it for. Made with Redis and Fastapi.
 
-GPL'd.
+MIT Licensed.
 
 To run locally (Python 3.8)
 
@@ -12,6 +12,6 @@ To run locally (Python 3.8)
 
 To Deploy to a server:
 
-Run `deploy.yml`, probably changing `inventory` to point to a server you can ssh into.
+Run `deploy.yml`, probably changing `inventory` to point to a server you can ssh into. Also make sure the hostname in the configs matches the hostname of your server.
 
 
