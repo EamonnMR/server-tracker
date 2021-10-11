@@ -10,9 +10,10 @@ app = FastAPI()
 def get_host_ip(request: Request):
     """ Rather than auth, the idea is that you can only affect
     games that you are yourself hosting.
-    This attempts to support both local development and prod
-    use behind a proxy server."""
-    return request.headers.get("X-Real-IP", request.client.host)
+    This setup runs behind cloudflare, but your own solution might
+    want to extract IPs differently."""
+    return request.headers.get("X-Forwarded-For", request.client.host).split(",")[0]
+
 
 @app.get("/")
 def index():
